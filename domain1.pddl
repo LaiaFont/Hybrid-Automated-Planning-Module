@@ -1,35 +1,77 @@
-(define (domain project-organization)
-  (:requirements :strips :typing)
-  (:types student task role time)
+(define
+    (domain car_nonlinear_mt_sc)
 
-  ;; Declare predicates, including successor relationships for time tracking
-  (:predicates 
-    (assigned ?s - student ?t - task)          ; Student is assigned to a task
-    (completed ?t - task)                      ; Task is completed
-    (has-role ?s - student ?r - role)          ; Student has a specific role
-    (available ?s - student)                   ; Student is available for assignment
-    (in-progress ?t - task)                    ; Task is in progress
-    (time-remaining ?t - task ?time - time)    ; Discrete time levels for each task
-    (successor ?time1 - time ?time2 - time)    ; Successor relationship between time levels
-    (final-time ?time - time)                  ; Marks the final time level for a task
-  )
+    (:predicates
+        (engine_running)
+        (engine_stopped)
+    )
 
-  ;; Define actions
-  (:action assign-task
-    :parameters (?s - student ?t - task ?r - role)
-    :precondition (and (available ?s) (has-role ?s ?r) (not (assigned ?s ?t)))
-    :effect (and (assigned ?s ?t) (not (available ?s)) (in-progress ?t))
-  )
+    (:functions
+        (d)
+        (v)
+        (a)
+        (drag_coefficient)
+        (max_acceleration)
+        (min_acceleration)
+        (max_speed)
+    )
 
-  (:action work-on-task
-    :parameters (?s - student ?t - task ?time1 - time ?time2 - time)
-    :precondition (and (assigned ?s ?t) (in-progress ?t) (time-remaining ?t ?time1) (successor ?time1 ?time2))
-    :effect (and (not (time-remaining ?t ?time1)) (time-remaining ?t ?time2))
-  )
+    (:constraint speed_limit
+        :parameters ()
+        :condition (and (>= (v) (* -1 (max_speed))) (<= (v) (max_speed)))
+    )
 
-  (:action complete-task
-    :parameters (?t - task ?time - time)
-    :precondition (and (in-progress ?t) (time-remaining ?t ?time) (final-time ?time))
-    :effect (and (not (in-progress ?t)) (completed ?t))
-  )
+    (:process displacement
+        :parameters ()
+        :precondition (and (engine_running) (> (v) 0))
+        :effect (increase (d) (* #t (v)))
+    )
+
+    (:process moving_drag
+        :parameters ()
+        :precondition (engine_running)
+        :effect (and
+                    (increase (v)  (* #t (a)) )   ;; velocity changes because of the acceleration
+        )
+    )
+    (:process drag_ahead
+        :parameters ()
+        :precondition (and (engine_running) (> (v) 0))
+        :effect (and
+                    (decrease (v)  (* #t (* (^ (v) 2) (drag_coefficient)  ) )  ) 
+        )
+    )
+
+    (:action accelerate
+        :parameters ()
+        :precondition (and (< (a) (max_acceleration)) (engine_running) )
+        :effect (increase (a) 1.0)  ;;
+    )
+
+    (:action stop_car
+        :parameters ()
+        :precondition (and (> (v) -0.1) (< (v) 0.1) (= (a) 0.0) (engine_running))
+        :effect (and
+                        (assign (v) 0.0)
+                        (engine_stopped)
+                        (not (engine_running))
+                )
+
+    )
+
+    (:action start_car
+        :parameters ()
+        :precondition (engine_stopped)
+        :effect (and
+                    (engine_running)
+                    (not (engine_stopped))
+                )
+    )
+
+
+    (:action decelerate
+        :parameters ()
+        :precondition (and (> (a) (min_acceleration)) (engine_running))
+        :effect (decrease (a) 1.0) ;;
+    )
 )

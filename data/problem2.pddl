@@ -32,6 +32,9 @@
     (= (remaining-time design2) 1)
     (= (remaining-time research1) 7)
     (= (remaining-time research2) 7)
+
+    ;; Initialize total time (arbitrarily high value for minimization)
+    (= (total-time) 60)
   )
 
   (:goal
@@ -44,4 +47,6 @@
       (completed research2)
     )
   )
+
+  (:metric minimize (total-time))
 )

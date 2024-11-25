@@ -8,71 +8,47 @@
     (task-role ?t - task ?r - role)      ;; Task requires a specific role
     (assigned ?s - student ?t - task)   ;; Student is assigned to a task
     (completed ?t - task)               ;; Task is completed
-    (available ?s - student)            ;; Student is available for a new task
   )
 
   ;; Numeric fluents
   (:functions
-    (remaining-time ?t - task)  
-    (priority ?t - task) ;; Add a priority fluent to balance task scheduling
-    (total-workload ?s - student) ;; Track workload assigned to each student    
+    (remaining-time ?t - task)          ;; Time left to complete a task
+    (total-time)                        ;; Total time to minimize (makespan)
   )
 
-  ;; Instantaneous action to start a task
-  (:action start-task
-    :parameters (?s - student ?t - task ?r - role)
-    :precondition (and 
-      (available ?s)
-      (task-role ?t ?r)
-      (has-role ?s ?r)
-      (> (remaining-time ?t) 0)
-    )
-    
-    :effect (and
-      (assigned ?s ?t)
-      (not (available ?s))
-      (increase (total-workload ?s) (priority ?t)) ;; Track workload based on priority
-    )
-  )
-
-  ;; Assign task to student
+  ;; Action: Assign Task to a Student
   (:action assign-task
     :parameters (?s - student ?t - task ?r - role)
     :precondition (and
-      (not (assigned ?s ?t))
-      (has-role ?s ?r)
-      (task-role ?t ?r)
-      (> (remaining-time ?t) 0)
+      (has-role ?s ?r)                  ;; Student has the required role
+      (task-role ?t ?r)                 ;; Task requires the role
+      (> (remaining-time ?t) 0)         ;; Task has remaining work
+      (forall (?x - task) (not (assigned ?s ?x))) ;; Student not already assigned
     )
     :effect (assigned ?s ?t)
   )
 
-
-  ;; Process to work on a task
+  ;; Process: Work on a Task
   (:process work-on-task
     :parameters (?s - student ?t - task)
     :precondition (and
-      (assigned ?s ?t) ;; Only start work if the student is assigned
-      (> (remaining-time ?t) 0)
+      (assigned ?s ?t)                  ;; Student is assigned to the task
+      (> (remaining-time ?t) 0)         ;; Task still has work to do
     )
     :effect (and
-      (decrease (remaining-time ?t) (* #t 1.0)) ;; Reduce remaining time
-      (when (= (remaining-time ?t) 0) (completed ?t)) ;; Mark task as completed
+      (decrease (remaining-time ?t) (* #t 1.0)) ;; Progress task over time
+      (decrease (total-time) (* #t 1.0))        ;; Decrease total time
     )
   )
-
-
-  ;; Instantaneous action to finish a task
-  (:action finish-task
+  (:action complete-task
     :parameters (?s - student ?t - task)
-    :precondition (and 
-      (assigned ?s ?t)                  ;; Student must be assigned to the task
-      (<= (remaining-time ?t) 0)        ;; Task must have no remaining time
+    :precondition (and
+        (assigned ?s ?t)
+        (= (remaining-time ?t) 0)       ;; Task must be complete
     )
     :effect (and
-      (completed ?t)                    ;; Task is marked completed
-      (not (assigned ?s ?t))            ;; Student is unassigned from the task
-      (available ?s)                    ;; Student becomes available again
+        (completed ?t)                  ;; Mark task as completed
+        (not (assigned ?s ?t))          ;; Unassign the student
     )
   )
 )

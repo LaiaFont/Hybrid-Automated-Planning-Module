@@ -13,7 +13,8 @@
   ;; Numeric fluents
   (:functions
     (remaining-time ?t - task)          ;; Time left to complete a task
-    (total-time)                        ;; Total time to minimize (makespan)
+    (priority ?t - task)
+    (total-time)                        ;; Total time to minimize (length of project in days)
   )
 
   ;; Action: Assign Task to a Student
@@ -23,6 +24,14 @@
       (has-role ?s ?r)                  ;; Student has the required role
       (task-role ?t ?r)                 ;; Task requires the role
       (> (remaining-time ?t) 0)         ;; Task has remaining work
+      (forall (?x - task)               ;; Check no higher-priority task is available
+        (or
+          (= (priority ?x) (priority ?t)) ;; Same priority as current task
+          (> (priority ?x) (priority ?t)) ;; Lower priority or already completed
+          (completed ?x)                 ;; Task is completed
+          (not (> (remaining-time ?x) 0)) ;; No remaining work
+        )
+      )
       (forall (?x - task) (not (assigned ?s ?x))) ;; Student not already assigned
     )
     :effect (assigned ?s ?t)

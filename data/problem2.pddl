@@ -33,6 +33,14 @@
     (= (remaining-time research1) 7)
     (= (remaining-time research2) 7)
 
+    ;; Task priorities
+    (= (priority coding1) 1) ;; Highest priority
+    (= (priority coding2) 2)
+    (= (priority design1) 3)
+    (= (priority design2) 4)
+    (= (priority research1) 1)
+    (= (priority research2) 3)
+
     ;; Initialize total time (arbitrarily high value for minimization)
     (= (total-time) 60)
   )

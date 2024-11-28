@@ -17,6 +17,10 @@
     (has-role student2 researcher)
     (has-role student3 researcher)
 
+    (= (available-time student1) 5)
+    (= (available-time student2) 8)
+    (= (available-time student3) 10)
+
     ;; Task roles
     (task-role coding1 developer)
     (task-role coding2 developer)

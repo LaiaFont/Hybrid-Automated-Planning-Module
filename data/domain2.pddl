@@ -12,6 +12,7 @@
 
   ;; Numeric fluents
   (:functions
+    (available-time ?s - student)
     (remaining-time ?t - task)          ;; Time left to complete a task
     (priority ?t - task)
     (total-time)                        ;; Total time to minimize (length of project in days)
@@ -24,6 +25,7 @@
       (has-role ?s ?r)                  ;; Student has the required role
       (task-role ?t ?r)                 ;; Task requires the role
       (> (remaining-time ?t) 0)         ;; Task has remaining work
+      (> (available-time ?s) 0)         ;; Student has remaining time to work
       (forall (?x - task)               ;; Check no higher-priority task is available
         (or
           (= (priority ?x) (priority ?t)) ;; Same priority as current task
@@ -43,9 +45,11 @@
     :precondition (and
       (assigned ?s ?t)                  ;; Student is assigned to the task
       (> (remaining-time ?t) 0)         ;; Task still has work to do
+      (> (available-time ?s) 0)
     )
     :effect (and
       (decrease (remaining-time ?t) (* #t 1.0)) ;; Progress task over time
+      (decrease (available-time ?s) (* #t 1.0))
       (decrease (total-time) (* #t 1.0))        ;; Decrease total time
     )
   )

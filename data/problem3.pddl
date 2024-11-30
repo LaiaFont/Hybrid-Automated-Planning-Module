@@ -1,5 +1,5 @@
 (define (problem project-plan)
-  (:domain planning)
+  (:domain planning-v2)
 
   (:objects
     student1 student2 student3 - student
@@ -7,6 +7,8 @@
     design1 design2 - task
     research1 research2 - task
     developer designer researcher - role
+    dev-meeting1 dev-meeting2 - meeting
+    team-meeting1 - meeting
   )
 
   (:init
@@ -16,6 +18,10 @@
     (has-role student2 designer)
     (has-role student2 researcher)
     (has-role student3 researcher)
+
+    (not (available student1))
+    (not (available student2))
+    (not (available student3))
 
     (= (available-time student1) 5)
     (= (available-time student2) 8)
@@ -42,15 +48,17 @@
     (= (remaining-time research2) 7)
 
     ;; Task priorities
-    (= (priority coding1) 1) ;; Highest priority
-    (= (priority coding2) 2)
-    (= (priority design1) 3)
-    (= (priority design2) 4)
+    (= (priority coding1) 3) ;; Highest priority
+    (= (priority coding2) 4)
+    (= (priority design1) 2)
+    (= (priority design2) 3)
     (= (priority research1) 1)
-    (= (priority research2) 3)
+    (= (priority research2) 1)
 
     ;; Initialize total time (arbitrarily high value for minimization)
     (= (total-time) 60)
+
+    (= (completed-task-count) 0)
   )
 
   (:goal
@@ -61,9 +69,12 @@
       (completed design2)
       (completed research1)
       (completed research2)
+      (meeting-scheduled dev-meeting1)
+      (meeting-scheduled dev-meeting2)
+      (meeting-scheduled team-meeting1)
     )
   )
 
  
-  (:metric minimize (- (+ (total-time) (- (points student1)) (- (points student2)) (- (points student3)))))
+  (:metric minimize (total-time))
 )

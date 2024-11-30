@@ -1,6 +1,6 @@
-(define (domain planning)
-  (:requirements :typing :fluents :processes :numeric-fluents)
-  (:types student task role)
+(define (domain planning-v2)
+  (:requirements :typing :fluents :time :numeric-fluents :negative-preconditions)
+  (:types student task role meeting)
 
   ;; Predicates
   (:predicates 
@@ -8,6 +8,8 @@
     (task-role ?t - task ?r - role)      ;; Task requires a specific role
     (assigned ?s - student ?t - task)   ;; Student is assigned to a task
     (completed ?t - task)               ;; Task is completed
+    (meeting-scheduled ?m - meeting)
+    (available ?s -student)
   )
 
   ;; Numeric fluents
@@ -54,6 +56,7 @@
       (decrease (total-time) (* #t 1.0))        ;; Decrease total time
     )
   )
+
   (:action complete-task
     :parameters (?s - student ?t - task)
     :precondition (and
@@ -61,9 +64,41 @@
         (= (remaining-time ?t) 0)       ;; Task must be complete
     )
     :effect (and
-        (completed ?t)                  ;; Mark task as completed
-        (increase (points ?s) 20)
-        (not (assigned ?s ?t))          ;; Unassign the student
+      (completed ?t)                  ;; Mark task as completed
+      (log-points ?s)
+      (not (assigned ?s ?t))          ;; Unassign the student
+      (available ?s)
+      (increase (log) (case ?s          ;; Update log to reflect which student earned points
+        (student1 10)
+        (student2 20)
+        (student3 30)))
+      )
+  )
+
+  (:action schedule-developer-meeting
+    :parameters (?m - meeting)
+    :precondition (and
+      (not (meeting-scheduled ?m))        ;; Meeting not yet scheduled
+      (forall (?s - student)
+        (or
+          (not (has-role ?s developer))  ;; If not a developer, ignore
+          (available ?s)                ;; If a developer, must be available
+        )
+      )
     )
+    :effect (meeting-scheduled ?m)        ;; Mark meeting as scheduled
+  )
+
+  (:action schedule-whole-team-meeting
+    :parameters (?m - meeting)
+    :precondition (and
+      (not (meeting-scheduled ?m))        ;; Meeting not yet scheduled
+      (forall (?s - student)              ;; All students must be available
+        (available ?s)
+      )
+      (completed research1)               ;; Analysis tasks must be completed
+      (completed research2)               ;; Example second analysis task
+    )
+    :effect (meeting-scheduled ?m)        ;; Mark meeting as scheduled
   )
 )

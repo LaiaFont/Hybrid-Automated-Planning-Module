@@ -33,7 +33,7 @@ class ProjectManagementEnv(AECEnv):
         self.action_space = Discrete(3)
 
         # Define observations (e.g., remaining time, roles, tasks)
-        self.observation_space = Box(low=0, high=10, shape=(len(self.tasks),), dtype=np.int)
+        self.observation_space = Box(low=0, high=10, shape=(len(self.tasks),), dtype=int)
 
         # Initialize the state (remaining times of tasks)
         self.state = np.array([task['remaining_time'] for task in self.tasks.values()])

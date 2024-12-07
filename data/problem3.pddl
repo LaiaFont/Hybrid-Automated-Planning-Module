@@ -1,5 +1,5 @@
-(define (problem project-plan-with-meetings-combined)
-  (:domain planning-v2-meetings-combined)
+(define (problem project-plan-with-meetings-and-points)
+  (:domain planning-v2-meetings-with-points)
 
   (:objects
     student1 student2 student3 - student
@@ -43,8 +43,8 @@
     (= (remaining-time coding2) 2)
     (= (remaining-time design1) 1)
     (= (remaining-time design2) 1)
-    (= (remaining-time research1) 7)
-    (= (remaining-time research2) 7)
+    (= (remaining-time research1) 4)
+    (= (remaining-time research2) 4)
 
     ;; Task priorities
     (= (priority coding1) 3)
@@ -53,6 +53,11 @@
     (= (priority design2) 3)
     (= (priority research1) 1)
     (= (priority research2) 1)
+
+    ;; Points are initially 0
+    (= (points student1) 0)
+    (= (points student2) 0)
+    (= (points student3) 0)
 
     ;; Meetings are initially unscheduled
     (not (meeting-scheduled dev-meeting))
@@ -79,6 +84,9 @@
       (meeting-scheduled dev-meeting)
       (meeting-scheduled design-meeting)
       (meeting-scheduled research-meeting)
+      (>= (points student1) 10)
+      (>= (points student2) 15)
+      (>= (points student3) 10)
     )
   )
 

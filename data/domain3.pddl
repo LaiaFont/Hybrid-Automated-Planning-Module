@@ -1,4 +1,4 @@
-(define (domain planning-v2-meetings-combined)
+(define (domain planning-v2-meetings-with-points)
   (:requirements :typing :fluents :time :numeric-fluents :negative-preconditions)
   (:types student task role meeting)
 
@@ -9,7 +9,7 @@
     (assigned ?s - student ?t - task)
     (completed ?t - task)
     (meeting-scheduled ?m - meeting)
-    (meeting-for-role ?m - meeting ?r - role) ;; Meeting is associated with a role
+    (meeting-for-role ?m - meeting ?r - role)
     (available ?s - student)
   )
 
@@ -19,6 +19,7 @@
     (remaining-time ?t - task)
     (priority ?t - task)
     (total-time)
+    (points ?s - student) ;; Points earned by a student
   )
 
   ;; Action: Assign Task to a Student
@@ -68,6 +69,7 @@
       (completed ?t)
       (not (assigned ?s ?t))
       (available ?s)
+      (increase (points ?s) 10) ;; Award 10 points for completing a task
     )
   )
 
@@ -84,6 +86,11 @@
         )
       )
     )
-    :effect (meeting-scheduled ?m)
+    :effect (and
+      (meeting-scheduled ?m)
+      (forall (?s - student)
+        (when (has-role ?s ?r)
+          (increase (points ?s) 5))) ;; Award 5 points for attending a meeting
+    )
   )
 )

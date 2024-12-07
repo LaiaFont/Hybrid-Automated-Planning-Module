@@ -1,43 +1,43 @@
-(define (domain planning-v2)
+(define (domain planning-v2-meetings-combined)
   (:requirements :typing :fluents :time :numeric-fluents :negative-preconditions)
   (:types student task role meeting)
 
   ;; Predicates
   (:predicates 
-    (has-role ?s - student ?r - role)    ;; Student has a specific role
-    (task-role ?t - task ?r - role)      ;; Task requires a specific role
-    (assigned ?s - student ?t - task)   ;; Student is assigned to a task
-    (completed ?t - task)               ;; Task is completed
+    (has-role ?s - student ?r - role)
+    (task-role ?t - task ?r - role)
+    (assigned ?s - student ?t - task)
+    (completed ?t - task)
     (meeting-scheduled ?m - meeting)
-    (available ?s -student)
+    (meeting-for-role ?m - meeting ?r - role) ;; Meeting is associated with a role
+    (available ?s - student)
   )
 
   ;; Numeric fluents
   (:functions
     (available-time ?s - student)
-    (remaining-time ?t - task)          ;; Time left to complete a task
+    (remaining-time ?t - task)
     (priority ?t - task)
-    (total-time)                        ;; Total time to minimize (length of project in days)
-    (points ?s - student) ;; Points assigned to each student after completing tasks
+    (total-time)
   )
 
   ;; Action: Assign Task to a Student
   (:action assign-task
     :parameters (?s - student ?t - task ?r - role)
     :precondition (and
-      (has-role ?s ?r)                  ;; Student has the required role
-      (task-role ?t ?r)                 ;; Task requires the role
-      (> (remaining-time ?t) 0)         ;; Task has remaining work
-      (> (available-time ?s) 0)         ;; Student has remaining time to work
-      (forall (?x - task)               ;; Check no higher-priority task is available
+      (has-role ?s ?r)
+      (task-role ?t ?r)
+      (> (remaining-time ?t) 0)
+      (> (available-time ?s) 0)
+      (forall (?x - task)
         (or
-          (= (priority ?x) (priority ?t)) ;; Same priority as current task
-          (> (priority ?x) (priority ?t)) ;; Lower priority or already completed
-          (completed ?x)                 ;; Task is completed
-          (not (> (remaining-time ?x) 0)) ;; No remaining work
+          (= (priority ?x) (priority ?t))
+          (> (priority ?x) (priority ?t))
+          (completed ?x)
+          (not (> (remaining-time ?x) 0))
         )
       )
-      (forall (?x - task) (not (assigned ?s ?x))) ;; Student not already assigned
+      (forall (?x - task) (not (assigned ?s ?x)))
     )
     :effect (assigned ?s ?t)
   )
@@ -46,59 +46,44 @@
   (:process work-on-task
     :parameters (?s - student ?t - task)
     :precondition (and
-      (assigned ?s ?t)                  ;; Student is assigned to the task
-      (> (remaining-time ?t) 0)         ;; Task still has work to do
+      (assigned ?s ?t)
+      (> (remaining-time ?t) 0)
       (> (available-time ?s) 0)
     )
     :effect (and
-      (decrease (remaining-time ?t) (* #t 1.0)) ;; Progress task over time
+      (decrease (remaining-time ?t) (* #t 1.0))
       (decrease (available-time ?s) (* #t 1.0))
-      (decrease (total-time) (* #t 1.0))        ;; Decrease total time
+      (decrease (total-time) (* #t 1.0))
     )
   )
 
+  ;; Action: Complete Task
   (:action complete-task
     :parameters (?s - student ?t - task)
     :precondition (and
-        (assigned ?s ?t)
-        (= (remaining-time ?t) 0)       ;; Task must be complete
+      (assigned ?s ?t)
+      (= (remaining-time ?t) 0)
     )
     :effect (and
-      (completed ?t)                  ;; Mark task as completed
-      (log-points ?s)
-      (not (assigned ?s ?t))          ;; Unassign the student
+      (completed ?t)
+      (not (assigned ?s ?t))
       (available ?s)
-      (increase (log) (case ?s          ;; Update log to reflect which student earned points
-        (student1 10)
-        (student2 20)
-        (student3 30)))
-      )
+    )
   )
 
-  (:action schedule-developer-meeting
-    :parameters (?m - meeting)
+  ;; Action: Schedule Meeting
+  (:action schedule-meeting
+    :parameters (?r - role ?m - meeting)
     :precondition (and
-      (not (meeting-scheduled ?m))        ;; Meeting not yet scheduled
-      (forall (?s - student)
+      (meeting-for-role ?m ?r)
+      (not (meeting-scheduled ?m))
+      (forall (?t - task)
         (or
-          (not (has-role ?s developer))  ;; If not a developer, ignore
-          (available ?s)                ;; If a developer, must be available
+          (not (task-role ?t ?r))
+          (completed ?t)
         )
       )
     )
-    :effect (meeting-scheduled ?m)        ;; Mark meeting as scheduled
-  )
-
-  (:action schedule-whole-team-meeting
-    :parameters (?m - meeting)
-    :precondition (and
-      (not (meeting-scheduled ?m))        ;; Meeting not yet scheduled
-      (forall (?s - student)              ;; All students must be available
-        (available ?s)
-      )
-      (completed research1)               ;; Analysis tasks must be completed
-      (completed research2)               ;; Example second analysis task
-    )
-    :effect (meeting-scheduled ?m)        ;; Mark meeting as scheduled
+    :effect (meeting-scheduled ?m)
   )
 )

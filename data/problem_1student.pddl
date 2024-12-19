@@ -3,6 +3,7 @@
 
   (:objects
     student1 - student
+    student2 - student
     task1 - task
   )
 

@@ -1,6 +1,6 @@
 (define (domain simple-planning)
-  (:requirements :typing :fluents :processes :numeric-fluents)
-  (:types student task role)
+  (:requirements :typing :fluents)
+  (:types student task)
 
   ;; Predicates
   (:predicates 
@@ -33,6 +33,7 @@
     )
     :effect (decrease (remaining-time ?t) (* #t 1.0)) ;; Reduce remaining time
     )
+  
   (:action complete-task
     :parameters (?s - student ?t - task)
     :precondition (and

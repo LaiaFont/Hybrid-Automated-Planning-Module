@@ -54,7 +54,7 @@
     )
 
     ;; Process for group work
-    (:process group-work-on-task
+    (:process work-on-task
         :parameters (?s - student ?c - chapter)
         :precondition (and
             (group-member ?s ?c)                 ;; Must be a group member

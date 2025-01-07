@@ -4,10 +4,25 @@ from telebot import types
 import time
 import requests
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+OPEN_AI = os.getenv('OPEN_AI')
+
+user_plans = {}
+
+def getDomain(type):
+    domain = '../PM-planning/domain.pddl' if type == 1 else '../exam-planning/domain_groups.pddl'
+    problem = '../PM-planning/problem_1.pddl' if type == 1 else '../exam-planning/problem_1_groups.pddl'
+
+    with open(domain, "r") as domain_file:
+        domain_content = domain_file.read()
+
+    with open(problem, "r") as problem_file:
+        problem_content = problem_file.read()
+    return domain_content, problem_content
 
 def solveProblem(domain, problem):
     print("solveProblem function called")
@@ -16,12 +31,12 @@ def solveProblem(domain, problem):
     with open(domain, "r") as domain_file:
         domain_content = domain_file.read()
 
-    with open(problem, "r") as problem_file:
-        problem_content = problem_file.read()
+    # with open(problem, "r") as problem_file:
+    #     problem_content = problem_file.read()
 
     payload = {
         "domain": domain_content,
-        "problem": problem_content
+        "problem": problem
     }
 
     response = requests.post(url, json=payload)
@@ -79,19 +94,56 @@ def send_welcome(message):
 def return_problem(message):
     try:
         print("Handling /plan command")
-        plan, raw_plan = solveProblem("../PM-planning/domain.pddl", "../PM-planning/problem_1.pddl")
-        button_foo = types.InlineKeyboardButton('Yes', callback_data='yes')
-        button_bar = types.InlineKeyboardButton('No', callback_data='no')
+        client = OpenAI(api_key=OPEN_AI)
+        domain, problem = getDomain(1)
+        prompt = f"""Imagine you are a project manager, with the aim to help students become more productive with their school/uni projects. To do so, you use PDDL+ with ENHSP to provide them with customized plans. With the provided domain 
+        "{domain}" return a problem file, taking this file structure into account "{problem}", that will fit with the description provided by the group of students:
+        {message}
+        Please provide to solely the problem file (no extra tasks apart from the problem code) to execute the planner making sure the problem is solvable based on the domain"""
 
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(button_foo)
-        keyboard.add(button_bar)
+        try:
+            response = client.chat.completions.create(
+                model='gpt-4o-mini',
+                messages=[
+                    {"role": "system", "content": prompt}
+                ],
+                temperature=0.7,
+                timeout=20
+            )
 
-        if raw_plan:
-            bot.reply_to(message, f"Found plan with length of {plan[-1][0]} days")
-            bot.send_message(message.chat.id, "Do you want to see the plan?", reply_markup=keyboard)
-        else:
-            bot.reply_to(message, "No solution could be found. Please check your inputs.")
+            code = response.choices[0].message.content
+
+            cleaned_code = None
+            start_idx = code.find('(')
+            end_idx = code.rfind(')')
+
+            if start_idx != -1 and end_idx != -1:
+                cleaned_code = code[start_idx:end_idx + 1].strip()
+            else:
+                print("Error: Unexpected response format. Code extraction failed.")
+                bot.reply_to(message, "Failed to process the OpenAI response. Please try again.")
+        
+            plan, raw_plan = solveProblem("../PM-planning/domain.pddl", cleaned_code)
+            
+            user_plans[message.chat.id] = raw_plan
+
+            button_foo = types.InlineKeyboardButton('Yes', callback_data='yes')
+            button_bar = types.InlineKeyboardButton('No', callback_data='no')
+
+            keyboard = types.InlineKeyboardMarkup()
+            keyboard.add(button_foo)
+            keyboard.add(button_bar)
+
+            if raw_plan:
+                bot.reply_to(message, f"Found plan with length of {plan[-1][0]} days")
+                bot.send_message(message.chat.id, "Would you like to see the plan?", reply_markup=keyboard)
+            else:
+                bot.reply_to(message, "No solution could be found. Please check your inputs.")
+                
+        except Exception as e:
+            print(f"Error handling /plan command: {e}")
+            bot.reply_to(message, "Cannot connect to OPENAI's API.")
+
     except Exception as e:
         print(f"Error handling /plan command: {e}")
         bot.reply_to(message, "An error occurred while processing your request.")
@@ -101,9 +153,15 @@ def callback_handler(call):
     cid = call.message.chat.id
     mid = call.message.message_id
     answer = call.data
-    print(call)
+
     if answer == 'yes':
-        print("Hello")
+        plan = user_plans.get(cid)
+        if plan:
+            bot.send_message(cid, f"Here is your plan:\n\n{plan}")
+        else:
+            bot.send_message(cid, "Sorry, no plan was found for your request.")
+    elif answer == 'no':
+        bot.send_message(cid, "Alright! Let me know if you need help with anything else.")
 
 @bot.message_handler(func=lambda msg: True)
 def echo_all(message):

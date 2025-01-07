@@ -121,34 +121,33 @@ def formatPlan(plan):
 @bot.message_handler(commands=['start', 'hello'])
 def send_welcome(message):
     plan ="""0: (assign-task student5 research_task1 researcher)
-0: (assign-task student4 research_task1 researcher)
-0: -----waiting---- [2.0]
-2.0: (complete-task student4 research_task1)
-2.0: (complete-task student5 research_task1)
-2.0: (assign-task student5 research_task2 researcher)
-2.0: (assign-task student4 research_task2 researcher)
-2.0: -----waiting---- [4.0]
-4.0: (complete-task student5 research_task2)
-4.0: (schedule-meeting researcher research-meeting)
-4.0: (complete-task student4 research_task2)
-4.0: (assign-task student3 design_task1 designer)
-4.0: -----waiting---- [6.0]
-6.0: (complete-task student3 design_task1)
-6.0: (assign-task student3 design_task2 designer)
-6.0: -----waiting---- [8.0]
-8.0: (complete-task student3 design_task2)
-8.0: (schedule-meeting designer design-meeting)
-8.0: (assign-task student2 coding_task1 developer)
-8.0: -----waiting---- [9.0]
-9.0: (assign-task student1 coding_task1 developer)
-9.0: -----waiting---- [10.0]
-10.0: (complete-task student2 coding_task1)
-10.0: (assign-task student2 coding_task2 developer)
-10.0: -----waiting---- [13.0]
-13.0: (complete-task student2 coding_task2)
-13.0: (schedule-meeting developer dev-meeting)
-13.0: (complete-task student1 coding_task1)"""
-    print(formatPlan(plan))
+    0: (assign-task student4 research_task1 researcher)
+    0: -----waiting---- [2.0]
+    2.0: (complete-task student4 research_task1)
+    2.0: (complete-task student5 research_task1)
+    2.0: (assign-task student5 research_task2 researcher)
+    2.0: (assign-task student4 research_task2 researcher)
+    2.0: -----waiting---- [4.0]
+    4.0: (complete-task student5 research_task2)
+    4.0: (schedule-meeting researcher research-meeting)
+    4.0: (complete-task student4 research_task2)
+    4.0: (assign-task student3 design_task1 designer)
+    4.0: -----waiting---- [6.0]
+    6.0: (complete-task student3 design_task1)
+    6.0: (assign-task student3 design_task2 designer)
+    6.0: -----waiting---- [8.0]
+    8.0: (complete-task student3 design_task2)
+    8.0: (schedule-meeting designer design-meeting)
+    8.0: (assign-task student2 coding_task1 developer)
+    8.0: -----waiting---- [9.0]
+    9.0: (assign-task student1 coding_task1 developer)
+    9.0: -----waiting---- [10.0]
+    10.0: (complete-task student2 coding_task1)
+    10.0: (assign-task student2 coding_task2 developer)
+    10.0: -----waiting---- [13.0]
+    13.0: (complete-task student2 coding_task2)
+    13.0: (schedule-meeting developer dev-meeting)
+    13.0: (complete-task student1 coding_task1)"""
     bot.reply_to(message, formatPlan(plan), parse_mode="Markdown")
 
 @bot.message_handler(commands=['plan'])
@@ -186,9 +185,7 @@ def return_problem(message):
         
             plan, raw_plan = solveProblem("../PM-planning/domain.pddl", cleaned_code)
             
-            print(raw_plan)
             user_plans[message.chat.id] = formatPlan(raw_plan)
-            print(formatPlan(raw_plan))
 
             button_foo = types.InlineKeyboardButton('Yes', callback_data='yes')
             button_bar = types.InlineKeyboardButton('No', callback_data='no')
@@ -220,7 +217,7 @@ def callback_handler(call):
     if answer == 'yes':
         plan = user_plans.get(cid)
         if plan:
-            bot.send_message(cid, plan)
+            bot.send_message(cid, plan, parse_mode="Markdown")
         else:
             bot.send_message(cid, "Sorry, no plan was found for your request.")
     elif answer == 'no':

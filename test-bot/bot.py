@@ -74,6 +74,7 @@ def solveProblem(domain, problem):
                             break
                     
                     formatted_plan = "\n".join(plan_lines)
+                    print(formatted_plan)
 
                     return plan_lines, formatted_plan
             else:

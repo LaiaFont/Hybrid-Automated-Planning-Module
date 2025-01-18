@@ -1,46 +1,100 @@
 # Hybrid Automated Planning Module (HAPM)
-Welcome to the Hybrid Automated PLanning Module repository! In it you will find the code used for my master's thesis (An Adaptive and Gamified Educational Experience using Chatbots) experiments.
 
-In here you will find both test case codes: Project Management (PM) and Study Exam (SE). You will find the domains and the different proposed problems.
+Welcome to the Hybrid Automated Planning Module (HAPM) repository! This repository contains the code and resources used for experiments conducted as part of my master's thesis: **"An Adaptive and Gamified Educational Experience using Chatbots."**
 
-Additionally, you will find the Telegram chatbot prototype that implements the HAPM.
+The repository includes:
+- Test case codes for:
+  - **Project Management (PM)**
+  - **Study Exam (SE)**
+- Domains and proposed problem definitions.
+- A **Telegram chatbot prototype** implementing the HAPM.
 
-## Run the HAPM
-In order to execute the domain and problems there exist two options: copy pasting the code into the https://editor.planning.domains/# webpage and selecting the solver to "ENHSP" or using the VSCode extension for PDDL. I recommend the second.
+## Repository Structure
+The repository is organized as follows:
+```
+Hybrid Automated Planning Module/
+├── PM-planning/
+    ├── domain.pddl
+    ├── problem_1.pddl
+    ├── problem_2.pddl
+    ├── problem_3.pddl
+├── SE-planning/
+    ├── domain.pddl
+    ├── problem_1.pddl
+    ├── problem_2.pddl
+    ├── problem_3.pddl
+└── chatbot-prototype/
+    ├── .env.example
+    ├── bot.py
+    ├── requirements.txt
+```
 
-### Run on Planning.domains
-To run in the planning.domains editor, follow this steps:
-- Open your preferred browser
-- Enter this url https://editor.planning.domains/#
-- You will see a blank file, open another one by clicking on the top menu on File > New
-- On the first file paste the desired domain from the repository, copy the whole text
-- On the second file, copy the desired problem definition from the repository and paste it on the second file
-- Once both files on the webpage have the domain and the problem, search for the Solver button in the top menu and click on it
-- A pop-up will appear, make sure the domain has assigned the first file and the problem the second
-- Select ENHSP from the dropdown as the Solver
-- Click on Plan and wait till you obtain the solution under the documents on the left bar
+---
 
-### Run on VSCode
-To run on VSCode, you first have to install this extension https://marketplace.visualstudio.com/items?itemName=jan-dolejsi.pddl
+## Running the HAPM
+You can execute the domains and problems using one of two options:
+1. **Online PDDL Editor** (via Planning.domains)
+2. **VSCode with PDDL Extension** (recommended)
 
-Then follow these steps:
-- After following the installation instructions of the extension, open the repository folder on VSCode
-- Open the desired problem to obtain the plan for
-- Press Alt + P to select the solver
-- Select ENHSP from the list and press ENTER
-- Wait for the plan to be returned, a new screen will open with the found plan
+### Option 1: Run on Planning.domains
+To execute HAPM using the Planning.domains editor:
+1. Open your preferred browser and go to [Planning.domains editor](https://editor.planning.domains/#).
+2. In the editor:
+   - Open a new file via `File > New` from the top menu.
+   - Copy and paste the desired domain from this repository into the first file.
+   - Copy and paste the desired problem definition into the second file.
+3. Click the `Solver` button in the top menu. A pop-up window will appear:
+   - Assign the domain file to the **Domain** section.
+   - Assign the problem file to the **Problem** section.
+4. From the Solver dropdown, select `ENHSP`.
+5. Click `Plan` and wait for the solution to appear in the left panel under the documents section.
 
-## Run the chatbot prototype
-To run the chatbot prototype you need to obtain a Telegram bot API key, together with an OpenAI API key. Then follow these steps:
+### Option 2: Run on VSCode
+To execute HAPM using VSCode:
+1. Install the [PDDL Extension for VSCode](https://marketplace.visualstudio.com/items?itemName=jan-dolejsi.pddl).
+2. Open the repository folder in VSCode.
+3. Open the desired problem file to generate a plan.
+4. Press `Alt + P` to open the solver selection menu.
+5. Select `ENHSP` from the list and press `Enter`.
+6. Wait for the plan to generate. The plan will appear in a new tab within VSCode.
 
-- Create a new virtual environment 
-```python -m venv .venv```
-- Activate the virtual environment
-- Go to the chatbot-prototype folder through the terminal
-```cd chatbot-prototype```
-- Install the required packages
-```pip install -r requirements.txt```
-- Once installed, you just need to run the bot.py script
-```python bot.py```
+---
 
-To view the chatbot, go into Telegram and search for @mIA_ub_planning_bot and start talking to it through /plan <plan_description>.
+## Running the Chatbot Prototype
+To run the chatbot prototype, you will need:
+- A **Telegram Bot API Key**.
+- An **OpenAI API Key**.
+
+### Steps to Run the Chatbot:
+1. Create a new virtual environment:
+   ```bash
+   python -m venv .venv
+   ```
+2. Activate the virtual environment:
+   - **Windows**: `.\.venv\Scripts\activate`
+   - **Mac/Linux**: `source .venv/bin/activate`
+3. Navigate to the `chatbot-prototype` folder:
+   ```bash
+   cd chatbot-prototype
+   ```
+4. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Run the bot script:
+   ```bash
+   python bot.py
+   ```
+
+### Accessing the Chatbot
+1. Open Telegram and search for `@mIA_ub_planning_bot`.
+2. Interact with the bot using the `/plan <plan_description>` command.
+
+---
+
+## Contribution
+Contributions, suggestions, or bug reports are welcome! Please open an issue or submit a pull request for any improvements.
+
+---
+
+Feel free to reach out if you have any questions or need assistance!

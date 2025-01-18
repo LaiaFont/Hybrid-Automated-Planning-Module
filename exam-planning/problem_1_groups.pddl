@@ -13,7 +13,6 @@
         (has-preference Alice chapter1)
         (has-preference Alice chapter2)
         (has-preference Bob chapter1)
-        (has-preference Bob chapter3)
         (has-preference Charlie chapter1)
         (has-preference Dana chapter2)
         (has-preference Dana chapter3)

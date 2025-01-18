@@ -60,16 +60,24 @@
 
   ;; Action: Complete Task
   (:action complete-task
-    :parameters (?s - student ?t - task)
+    :parameters (?t - task)
     :precondition (and
-      (assigned ?s ?t)
+      (not (completed ?t))
       (= (remaining-time ?t) 0)
     )
     :effect (and
+      ;; Task is completed
       (completed ?t)
-      (not (assigned ?s ?t))
-      (available ?s)
-      (increase (points ?s) 10) ;; Award 10 points for completing a task
+      ;; Mark all students assigned to the task as available
+      (forall (?s - student)
+        (when (assigned ?s ?t)
+          (and
+            (not (assigned ?s ?t))
+            (available ?s)
+            (increase (points ?s) 10) ;; Award 10 points to each student
+          )
+        )
+      )
     )
   )
 

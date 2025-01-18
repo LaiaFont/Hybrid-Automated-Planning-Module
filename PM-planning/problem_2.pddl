@@ -6,7 +6,7 @@
     student1 student2 student3 - student
     design coding research - role
     task1 task2 task3 - task
-    meeting1 - meeting
+    meeting1 meeting2 meeting3 - meeting
   )
 
   ;; Initial state
@@ -40,8 +40,8 @@
 
     ;; Meeting for roles
     (meeting-for-role meeting1 design)
-    (meeting-for-role meeting1 coding)
-    (meeting-for-role meeting1 research)
+    (meeting-for-role meeting2 coding)
+    (meeting-for-role meeting3 research)
   )
 
   ;; Goal state
@@ -50,6 +50,8 @@
     (completed task2)
     (completed task3)
     (meeting-scheduled meeting1)
+    (meeting-scheduled meeting2)
+    (meeting-scheduled meeting3)
   ))
 
   (:metric minimize (total-time))

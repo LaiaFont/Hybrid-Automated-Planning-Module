@@ -1,4 +1,2 @@
 .venv
-bin
-optic
-nyx-main
+chatbot-prototype/.env

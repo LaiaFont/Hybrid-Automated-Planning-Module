@@ -1,6 +1,6 @@
 # Hybrid Automated Planning Module (HAPM)
 
-Welcome to the Hybrid Automated Planning Module (HAPM) repository! This repository contains the code and resources used for experiments conducted as part of my master's thesis: **"An Adaptive and Gamified Educational Experience using Chatbots."**
+Welcome to the Hybrid Automated Planning Module (HAPM) repository! This repository contains the code and resources used for experiments conducted as part of my master's thesis: **"An Adaptive and Gamified Educational Experience using Chatbots."** as an enhancement module for the mIA-UB chatbot ([look at previous work](https://diposit.ub.edu/dspace/handle/2445/201894)).
 
 The repository includes:
 - Test case codes for:
@@ -8,6 +8,7 @@ The repository includes:
   - **Study Exam (SE)**
 - Domains and proposed problem definitions.
 - A **Telegram chatbot prototype** implementing the HAPM.
+- A **RAG implementation test** notebook.
 
 ## Repository Structure
 The repository is organized as follows:
@@ -23,6 +24,9 @@ Hybrid Automated Planning Module/
     ├── problem_1.pddl
     ├── problem_2.pddl
     ├── problem_3.pddl
+├── RAG-testing/
+    ├── PresentacioCurs24-25.pdf
+    ├── RAG.ipynb
 └── chatbot-prototype/
     ├── .env.example
     ├── bot.py
@@ -89,6 +93,10 @@ To run the chatbot prototype, you will need:
 ### Accessing the Chatbot
 1. Open Telegram and search for `@mIA_ub_planning_bot`.
 2. Interact with the bot using the `/plan <plan_description>` command.
+
+---
+## Executing the RAG implementation test
+Run all the cells of the RAG notebook, you will be asked and OpenAI API key. Make sure the file you want to use is in the same folder as the notebook and that the path is correctly specified in variable **pdf_file_path**.
 
 ---
 

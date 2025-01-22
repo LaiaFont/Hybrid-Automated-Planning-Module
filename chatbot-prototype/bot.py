@@ -108,7 +108,7 @@ def formatPlan(plan):
             elif "complete-task" in action:
                 details = action.replace("(", "").replace(")", "").split()
                 output.append(
-                    f"- *Time {time}:* Complete `{details[2]}` by `{details[1]}`"
+                    f"- *Time {time}:* Complete `{details[1]}`"
                 )
             elif "schedule-meeting" in action:
                 details = action.replace("(", "").replace(")", "").split()
@@ -187,7 +187,8 @@ def return_problem(message):
                 bot.reply_to(message, "Failed to process the OpenAI response. Please try again.")
         
             plan, raw_plan = solveProblem("../PM-planning/domain.pddl", cleaned_code)
-            
+            days = raw_plan.split('\n')[-1].strip().split(':')[0]
+
             user_plans[message.chat.id] = formatPlan(raw_plan)
 
             button_foo = types.InlineKeyboardButton('Yes', callback_data='yes')
@@ -198,7 +199,7 @@ def return_problem(message):
             keyboard.add(button_bar)
 
             if raw_plan:
-                bot.reply_to(message, f"Found plan with length of {plan[-1][0]} days")
+                bot.reply_to(message, f"Found plan with length of {days} days")
                 bot.send_message(message.chat.id, "Would you like to see the plan?", reply_markup=keyboard)
             else:
                 bot.reply_to(message, "No solution could be found.")
